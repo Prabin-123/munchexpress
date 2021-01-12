@@ -5,16 +5,17 @@
           <card-component>
               <template slot="title">My Menu Items</template>  
               <template slot="body">
-                <div class="section">
+                <div class="section mb-3">
                   <multiselect
                     v-model="menu"
                     :options="categories"
+                    :close-on-select="true"
                     >
                   </multiselect>
                 </div>
-
-                <menu-group :items="currentMenuItems"></menu-group>
-
+                <div class="section">
+                  <menu-group :items="currentMenuItems"></menu-group>
+                </div>
               </template>  
           </card-component>
       </div>
@@ -22,7 +23,11 @@
           <card-component>
               <template slot="title">Add Menu Items</template>  
               <template slot="body">
-                <menu-add-form :categories="categories"></menu-add-form>
+                <menu-add-form 
+                  :categories="categories" 
+                  :resto-id="restoId"
+                  v-on:newMenuItemAdded="handleNewMenuItem"
+                ></menu-add-form>
               </template>  
           </card-component>
       </div>
@@ -36,7 +41,7 @@ import Multiselect from 'vue-multiselect';
 import MenuGroup from './MenuGroups.vue';
 import MenuAddForm from './MenuAddForm.vue';
 export default {
-  props: ["items"],
+  props: ['items', 'restoId'],
   components: {
     Multiselect, MenuGroup, MenuAddForm
   },
@@ -45,16 +50,24 @@ export default {
       this.categories.push(key);
     });
     this.menu = this.categories[0];
+    this.localItems = this.items;
   },
   data() {
     return {
+      localItems: '',
       menu: '',
       categories: []
     }
   },
   computed: {
     currentMenuItems() {
-      return this.items[this.menu];
+      return this.localItems[this.menu];
+    }
+  },
+  methods: {
+    handleNewMenuItem(item, category) {
+      console.log('item', item);
+      this.localItems[category].unshift(item);
     }
   }
 };

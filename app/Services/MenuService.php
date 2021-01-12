@@ -6,9 +6,9 @@ use App\Models\Menu;
 
 class MenuService
 {
-    public function getMenuWithCategory(array $restoIds)
+    public function getMenuWithCategory($restoId)
     {
-        $categories = Menu::whereIn('resto_id', $restoIds)->get()->groupBy('category.name');
-        return $categories;
+        $menuItems = Menu::where('resto_id', $restoId)->get()->groupBy('category.name');
+        return $menuItems;
     }
 }

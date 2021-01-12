@@ -10903,3 +10903,8 @@ a.text-dark:focus {
   }
 }
 
+.validation-message {
+  color: #e3342f;
+  font-size: 0.9em;
+}
+

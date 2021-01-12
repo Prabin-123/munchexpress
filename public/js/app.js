@@ -1982,6 +1982,15 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
 /* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_Validation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../../utils/Validation */ "./resources/js/utils/Validation.js");
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2008,21 +2017,47 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['categories'],
+  props: ['categories', 'restoId'],
   components: {
     Multiselect: vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default.a
   },
   data: function data() {
     return {
-      food: {
-        item: '',
-        category: ''
-      }
+      food: this.getBasicMenuItem(),
+      validation: new _utils_Validation__WEBPACK_IMPORTED_MODULE_1__["default"]()
     };
   },
   methods: {
-    handleSubmit: function handleSubmit() {}
+    getBasicMenuItem: function getBasicMenuItem() {
+      return {
+        item: '',
+        category: '',
+        price: '',
+        description: ''
+      };
+    },
+    handleSubmit: function handleSubmit() {
+      var _this = this;
+
+      console.log('form data', this.food);
+      var postData = this.food;
+      postData.restoId = this.restoId;
+      window.axios.post('api/item', postData).then(function (response) {
+        console.log('response', response.data);
+
+        _this.$emit('newMenuItemAdded', response.data, postData.category);
+
+        _this.food = _this.getBasicMenuItem();
+      })["catch"](function (error) {
+        console.log('error', error.response);
+
+        if (error.response.status == 422) {
+          _this.validation.setMessages(error.response.data.errors);
+        }
+      });
+    }
   }
 });
 
@@ -2075,12 +2110,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["items"],
+  props: ['items', 'restoId'],
   components: {
     Multiselect: vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default.a,
     MenuGroup: _MenuGroups_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -2094,16 +2134,24 @@ __webpack_require__.r(__webpack_exports__);
     });
 
     this.menu = this.categories[0];
+    this.localItems = this.items;
   },
   data: function data() {
     return {
+      localItems: '',
       menu: '',
       categories: []
     };
   },
   computed: {
     currentMenuItems: function currentMenuItems() {
-      return this.items[this.menu];
+      return this.localItems[this.menu];
+    }
+  },
+  methods: {
+    handleNewMenuItem: function handleNewMenuItem(item, category) {
+      console.log('item', item);
+      this.localItems[category].unshift(item);
     }
   }
 });
@@ -38417,6 +38465,11 @@ var render = function() {
                 _vm.$set(_vm.food, "item", $event.target.value)
               }
             }
+          }),
+          _vm._v(" "),
+          _c("div", {
+            staticClass: "validation-message",
+            domProps: { textContent: _vm._s(_vm.validation.getMessage("item")) }
           })
         ]),
         _vm._v(" "),
@@ -38436,6 +38489,13 @@ var render = function() {
                   _vm.$set(_vm.food, "category", $$v)
                 },
                 expression: "food.category"
+              }
+            }),
+            _vm._v(" "),
+            _c("div", {
+              staticClass: "validation-message",
+              domProps: {
+                textContent: _vm._s(_vm.validation.getMessage("category"))
               }
             })
           ],
@@ -38464,6 +38524,46 @@ var render = function() {
                 }
                 _vm.$set(_vm.food, "price", $event.target.value)
               }
+            }
+          }),
+          _vm._v(" "),
+          _c("div", {
+            staticClass: "validation-message",
+            domProps: {
+              textContent: _vm._s(_vm.validation.getMessage("price"))
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", { attrs: { for: "name" } }, [_vm._v("Description")]),
+          _vm._v(" "),
+          _c("textarea", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.food.description,
+                expression: "food.description"
+              }
+            ],
+            staticClass: "form-control",
+            attrs: { placeholder: "Enter food description" },
+            domProps: { value: _vm.food.description },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.food, "description", $event.target.value)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("div", {
+            staticClass: "validation-message",
+            domProps: {
+              textContent: _vm._s(_vm.validation.getMessage("description"))
             }
           })
         ]),
@@ -38515,32 +38615,37 @@ var render = function() {
             [
               _c("template", { slot: "title" }, [_vm._v("My Menu Items")]),
               _vm._v(" "),
-              _c(
-                "template",
-                { slot: "body" },
-                [
-                  _c(
-                    "div",
-                    { staticClass: "section" },
-                    [
-                      _c("multiselect", {
-                        attrs: { options: _vm.categories },
-                        model: {
-                          value: _vm.menu,
-                          callback: function($$v) {
-                            _vm.menu = $$v
-                          },
-                          expression: "menu"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c("menu-group", { attrs: { items: _vm.currentMenuItems } })
-                ],
-                1
-              )
+              _c("template", { slot: "body" }, [
+                _c(
+                  "div",
+                  { staticClass: "section mb-3" },
+                  [
+                    _c("multiselect", {
+                      attrs: {
+                        options: _vm.categories,
+                        "close-on-select": true
+                      },
+                      model: {
+                        value: _vm.menu,
+                        callback: function($$v) {
+                          _vm.menu = $$v
+                        },
+                        expression: "menu"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "section" },
+                  [
+                    _c("menu-group", { attrs: { items: _vm.currentMenuItems } })
+                  ],
+                  1
+                )
+              ])
             ],
             2
           )
@@ -38561,7 +38666,13 @@ var render = function() {
                 "template",
                 { slot: "body" },
                 [
-                  _c("menu-add-form", { attrs: { categories: _vm.categories } })
+                  _c("menu-add-form", {
+                    attrs: {
+                      categories: _vm.categories,
+                      "resto-id": _vm.restoId
+                    },
+                    on: { newMenuItemAdded: _vm.handleNewMenuItem }
+                  })
                 ],
                 1
               )
@@ -51203,6 +51314,55 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuGroups_vue_vue_type_template_id_707660cd___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MenuGroups_vue_vue_type_template_id_707660cd___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/utils/Validation.js":
+/*!******************************************!*\
+  !*** ./resources/js/utils/Validation.js ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Validation; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Validation = /*#__PURE__*/function () {
+  function Validation() {
+    _classCallCheck(this, Validation);
+
+    this.messages = {};
+  }
+
+  _createClass(Validation, [{
+    key: "getMessage",
+    value: function getMessage(field) {
+      if (this.messages[field]) {
+        return this.messages[field][0];
+      }
+    }
+  }, {
+    key: "setMessages",
+    value: function setMessages(messages) {
+      this.messages = messages;
+    }
+  }, {
+    key: "empty",
+    value: function empty() {
+      this.messages = {};
+    }
+  }]);
+
+  return Validation;
+}();
 
 
 
