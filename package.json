@@ -27,7 +27,9 @@
         "-": "0.0.1",
         "g": "^2.0.1",
         "npm": "^6.14.11",
+        "turbolinks": "^5.2.0",
         "vue-js-modal": "^2.0.0-rc.6",
-        "vue-multiselect": "^2.1.6"
+        "vue-multiselect": "^2.1.6",
+        "vue-turbolinks": "^2.2.1"
     }
 }

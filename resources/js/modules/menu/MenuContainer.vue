@@ -3,9 +3,10 @@
     <div class="row">
       <div class="col-md-8">
           <card-component>
-              <template slot="title">My Menu Items</template>  
+              <template slot="title">My Menu</template>  
               <template slot="body">
                 <div class="section mb-3">
+                  <label for="selector">Select a Category</label>
                   <multiselect
                     v-model="menu"
                     :options="categories"
@@ -14,6 +15,7 @@
                   </multiselect>
                 </div>
                 <div class="section">
+                  <label for="selector">Menu item for this category</label>
                   <menu-group :items="currentMenuItems"></menu-group>
                 </div>
               </template>  
@@ -66,7 +68,6 @@ export default {
   },
   methods: {
     handleNewMenuItem(item, category) {
-      console.log('item', item);
       this.localItems[category].unshift(item);
     }
   }

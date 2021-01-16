@@ -55,19 +55,18 @@ export default {
             };
         },
         handleSubmit() {
-            console.log('form data', this.food);
-            let postData = this.food;
-            postData.restoId = this.restoId;
-            window.axios.post('api/item', postData).then(response => {
+            let food = this.food;
+            food.restoId = this.restoId;
+            window.axios.post('/api/item', food).then(response => {
                 console.log('response', response.data);
-                this.$emit('newMenuItemAdded', response.data, postData.category);
+                this.$emit('newMenuItemAdded', response.data, food.category);
                 this.food = this.getBasicMenuItem();
             }).catch(error => {
-                console.log('error', error.response);
-                if(error.response.status == 422 ) {
-                    this.validation.setMessages(error.response.data.errors)
+                if (error.response.status && error.response.status == 422) {
+                this.validation.setMessages(error.response.data.errors);
                 }
-            })
+                console.log('error', error);
+            });
         }
     }
 }
