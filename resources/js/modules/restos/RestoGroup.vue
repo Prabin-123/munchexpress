@@ -5,9 +5,14 @@
             <card-component>
                 <template slot="title">{{resto.name}}</template>
                 <template slot="body">
-                    {{resto.location}}
+                    <div class="content-container">
+                        <i class="fa fa-map-marker-alt"></i> {{resto.location}}
+                        <br>
+                        <i class="fa fa-table"></i> {{resto.tables}}
+                    </div>
                     <br>
                     <a v-bind:href="resto.slug" class="card-link">Menu</a>
+                    <a v-bind:href="resto.ordersSlug" class="card-link">Orders</a>
                 </template>
             </card-component>
         </div>
@@ -15,7 +20,11 @@
             <card-component>
                 <template slot="title">Add new Restaurant</template>
                 <template slot="body">
-                    <span @click="handleAddNewResto">+</span>
+                    <div class="add-button-wrapper">
+                        <span @click="handleAddNewResto">
+                        <i class="fa fa-plus-circle fa-5x pointer"></i>
+                    </span>
+                    </div>
                 </template>
             </card-component>
             <modal name="add-new-resto" height='auto'>
@@ -67,3 +76,13 @@ export default {
     }
 }
 </script>
+
+
+<style lang="scss" scoped>
+    .add-button-wrapper {
+        text-align: center;
+    }
+    .content-container {
+        height: 70px;
+    }
+</style>
