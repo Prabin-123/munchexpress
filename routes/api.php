@@ -20,5 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/resto', 'RestaurantController@storeResto');
+    Route::post('/resto/menu', 'MenuController@getRestoMenu');
 });
 Route::post('/item', 'MenuController@addMenuItem');
